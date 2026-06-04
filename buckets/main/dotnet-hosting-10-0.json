@@ -1,0 +1,19 @@
+{
+    "name": "dotnet-hosting-10-0",
+    "version": "10.0.5.26153",
+    "description": "Microsoft .NET 10.0.5 - Windows Server Hosting",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found%20exe/dotnet-hosting-10.0.5-win%20%281%29.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

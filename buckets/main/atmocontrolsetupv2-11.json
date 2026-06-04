@@ -1,0 +1,19 @@
+{
+    "name": "atmocontrolsetupv2-11",
+    "version": "2.11",
+    "description": "AtmoControlSetupV2 11",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found%20exe/AtmoControlSetupV2.11.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

@@ -1,0 +1,19 @@
+{
+    "name": "clicksoftware-v392",
+    "version": "unknown",
+    "description": "clicksoftware v392",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/astha/Downloads/clicksoftware_v392.zip"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "zip"
+    },
+    "post_install": []
+}

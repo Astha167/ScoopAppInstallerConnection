@@ -1,0 +1,22 @@
+{
+    "version": "1.0.0.7",
+    "description": "AudioAssistantTool",
+    "homepage": "Unknown",
+    "license": "Unknown",
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found exe/AudioAssistantTool_1.0.0.7_Setup.exe"
+        },
+        "32bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found exe/AudioAssistantTool_1.0.0.7_Setup.exe"
+        }
+    },
+    "installer": {
+        "type": "gui",
+        "file": "AudioAssistantTool_1.0.0.7_Setup.exe"
+    },
+    "post_install": [
+        "Write-Host 'AudioAssistantTool GUI automation completed.'"
+    ],
+    "bin": "AudioAssistantTool.exe"
+}

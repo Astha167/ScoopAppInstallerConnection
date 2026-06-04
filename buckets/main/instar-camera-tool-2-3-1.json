@@ -1,0 +1,19 @@
+{
+    "name": "instar-camera-tool-2-3-1",
+    "version": "2.3.1",
+    "description": "INSTAR Camera Tool 2 3 1",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/astha/Downloads/INSTAR_Camera_Tool_2.3.1.zip"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "zip"
+    },
+    "post_install": []
+}

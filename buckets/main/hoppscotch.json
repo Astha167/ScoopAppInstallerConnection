@@ -1,0 +1,27 @@
+{
+    "name": "hoppscotch",
+    "version": "26.2.1-0",
+    "description": "A cross-platform API development environment, open-source alternative to Postman",
+    "homepage": "https://hoppscotch.com/",
+    "license": "MIT",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/hoppscotch/releases/releases/download/v26.2.1-0/Hoppscotch_win_x64.msi",
+            "extract_dir": "PFiles\\Hoppscotch"
+        }
+    },
+    "bin": [
+        "hoppscotch-desktop.exe"
+    ],
+    "shortcuts": [
+        [
+            "hoppscotch-desktop.exe",
+            "Hoppscotch"
+        ]
+    ],
+    "installer": {
+        "type": "msi"
+    },
+    "post_install": []
+}

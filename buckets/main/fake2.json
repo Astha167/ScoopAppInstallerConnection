@@ -1,0 +1,19 @@
+{
+    "name": "fake2",
+    "version": "unknown",
+    "description": "fake2",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Desktop/MakingScoop/testing_exes/fake2.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

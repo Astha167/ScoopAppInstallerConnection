@@ -1,0 +1,34 @@
+{
+    "name": "notepadplusplus",
+    "version": "8.9.2",
+    "description": "A free source code editor and Notepad replacement that supports several languages",
+    "homepage": "https://notepad-plus-plus.org",
+    "license": "GPL-3.0",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.2/npp.8.9.2.portable.x64.zip",
+            "extract_dir": ""
+        },
+    
+        "32bit": {
+            "url": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.2/npp.8.9.2.portable.zip",
+            "hash": "32bdd72a55099addef958690b4c507e33d8a99cbe835ff52e80c5e4041019681"
+        },
+        "arm64": {
+            "url": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.2/npp.8.9.2.portable.arm64.zip",
+            "hash": "2df4a4292f1f73646a9cd3ab15402ee85d89bff82fb73aca6a154485433baace"
+        }
+    },
+    "bin": [
+        "notepad++.exe"
+    ],
+    "shortcuts": [
+        [
+            "notepad++.exe",
+            "Notepad++"
+        ]
+    ],
+    "installer": {},
+    "post_install": []
+}

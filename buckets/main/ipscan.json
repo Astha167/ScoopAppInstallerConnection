@@ -1,0 +1,28 @@
+{
+    "name": "ipscan",
+    "version": "3.9.3",
+    "description": "Fast and friendly network scanner — scans IP addresses and ports",
+    "homepage": "https://angryip.org",
+    "license": "GPL-2.0",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/angryip/ipscan/releases/download/3.9.3/ipscan-3.9.3-setup.exe",
+            "hash": "sha256:91d77c63169249e8fcdd2d912963d4d5cd143d87b65352fc62ba8113fb49f9f5",
+            "extract_dir": "PFiles\\Angry IP Scanner"
+        }
+    },
+    "bin": [
+        "ipscan.exe"
+    ],
+    "shortcuts": [
+        [
+            "ipscan.exe",
+            "Angry IP Scanner"
+        ]
+    ],
+    "installer": {
+        "type": "nsis"
+    },
+    "post_install": []
+}

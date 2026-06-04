@@ -1,0 +1,19 @@
+{
+    "name": "fake3",
+    "version": "unknown",
+    "description": "fake3",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Desktop/MakingScoop/testing_exes/fake3.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

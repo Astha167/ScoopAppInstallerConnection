@@ -1,0 +1,19 @@
+{
+    "name": "crystalmaker11-win",
+    "version": "unknown",
+    "description": "crystalmaker11 win",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/astha/Downloads/crystalmaker11_win.zip"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "zip"
+    },
+    "post_install": []
+}

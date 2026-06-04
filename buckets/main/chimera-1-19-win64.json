@@ -1,0 +1,19 @@
+{
+    "name": "chimera-1-19-win64",
+    "version": "1.19",
+    "description": "Chimera Setup",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/astha/Downloads/chimera-1.19-win64.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "inno"
+    },
+    "post_install": []
+}

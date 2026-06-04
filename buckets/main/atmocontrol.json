@@ -1,0 +1,9 @@
+{
+    "version": "2.11",
+    "description": "AtmoControl",
+    "homepage": "unknown",
+    "license": "Freeware",
+    "installer": {
+        "type": "gui"
+    }
+}

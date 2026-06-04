@@ -1,0 +1,19 @@
+{
+    "name": "imazingconverterwindows",
+    "version": "2.0.12.0",
+    "description": "iMazing Converter Setup",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/Downloads/iMazingConverterWindows.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

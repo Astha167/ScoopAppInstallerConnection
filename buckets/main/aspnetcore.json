@@ -1,0 +1,7 @@
+{
+    "version": "10.0.5",
+    "description": "ASP.NET Core Runtime",
+    "homepage": "https://dotnet.microsoft.com/",
+    "license": "MIT",
+    "installer_type": "gui"
+}

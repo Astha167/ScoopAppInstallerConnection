@@ -1,0 +1,19 @@
+{
+    "name": "integriti-24-0-0-21780",
+    "version": "24.0.0.21780",
+    "description": "Integriti (24 0 0 21780)",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/Downloads/Integriti_%2824.0.0.21780%29.zip"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "zip"
+    },
+    "post_install": []
+}

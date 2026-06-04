@@ -1,0 +1,19 @@
+{
+    "name": "axisiputilitysetup",
+    "version": "5.3.1.0",
+    "description": "AXIS IP Utility Setup",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/Downloads/AxisIPUtilitySetup.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

@@ -1,0 +1,58 @@
+[
+    {
+        "filename": "hoppscotch-desktop.exe",
+        "filepath": "C:\\Users\\sujit\\myscoop\\apps\\hoppscotch\\26.2.1-0\\hoppscotch-desktop.exe",
+        "filesize": {
+            "bytes": 66555424,
+            "human": "63.4 MB"
+        },
+        "filecrc32": "E109BAD1",
+        "fileversion": "26.2.1",
+        "filedescription": "Hoppscotch",
+        "filemanufacturer": "hoppscotch",
+        "_app_name": "hoppscotch",
+        "_app_version": "26.2.1-0"
+    },
+    {
+        "filename": "MySQLWorkbench.exe",
+        "filepath": "C:\\Users\\sujit\\myscoop\\apps\\mysqlworkbench\\8.0.46\\MySQLWorkbench.exe",
+        "filesize": {
+            "bytes": 522384,
+            "human": "510 KB"
+        },
+        "filecrc32": "EA43B931",
+        "fileversion": "8.0.46",
+        "filedescription": "MySQL Workbench",
+        "filemanufacturer": "Oracle Corporation",
+        "_app_name": "mysqlworkbench",
+        "_app_version": "8.0.46"
+    },
+    {
+        "filename": "notepad++.exe",
+        "filepath": "C:\\Users\\sujit\\myscoop\\apps\\notepadplusplus\\8.9.2\\notepad++.exe",
+        "filesize": {
+            "bytes": 8429184,
+            "human": "8.0 MB"
+        },
+        "filecrc32": "0876F7FB",
+        "fileversion": "8.9.2",
+        "filedescription": "Notepad++",
+        "filemanufacturer": "Don HO don.h@free.fr",
+        "_app_name": "notepadplusplus",
+        "_app_version": "8.9.2"
+    },
+    {
+        "filename": "Postman.exe",
+        "filepath": "C:\\Users\\sujit\\myscoop\\apps\\postman\\12.1.4\\Postman.exe",
+        "filesize": {
+            "bytes": 194631800,
+            "human": "185 MB"
+        },
+        "filecrc32": "07BA9CDA",
+        "fileversion": "12.1.4",
+        "filedescription": "Postman",
+        "filemanufacturer": "Postman",
+        "_app_name": "postman",
+        "_app_version": "12.1.4"
+    }
+]

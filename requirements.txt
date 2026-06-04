@@ -1,0 +1,12 @@
+click
+requests
+tqdm
+py7zr
+colorama
+gitpython
+pywin32
+pywinauto
+pyautogui
+psutil
+fastapi
+uvicorn

@@ -1,0 +1,27 @@
+{
+    "name": "postman",
+    "version": "12.1.4",
+    "description": "Complete API development environment",
+    "homepage": "https://www.postman.com",
+    "license": "Freeware",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "https://dl.pstmn.io/download/12.1.4/Postman%20v12.1.4%20(x64).exe#/dl.7z",
+            "extract_dir": ""
+        }
+    },
+    "bin": [
+        "Postman.exe"
+    ],
+    "shortcuts": [
+        [
+            "Postman.exe",
+            "Postman"
+        ]
+    ],
+    "installer": {
+        "type": "7z"
+    },
+    "post_install": []
+}

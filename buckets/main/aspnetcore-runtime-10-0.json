@@ -1,0 +1,19 @@
+{
+    "name": "aspnetcore-runtime-10-0",
+    "version": "10.0.5.35903",
+    "description": "Microsoft ASP.NET Core Runtime - 10.0.5 (x86)",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found%20exe/aspnetcore-runtime-10.0.5-win-x86.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

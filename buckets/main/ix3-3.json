@@ -1,0 +1,19 @@
+{
+    "name": "ix3-3",
+    "version": "3.3.2724.0",
+    "description": "iX Developer 3.3",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/Downloads/iX3.3.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

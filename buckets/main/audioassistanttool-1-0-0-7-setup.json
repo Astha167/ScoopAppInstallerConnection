@@ -1,0 +1,19 @@
+{
+    "name": "audioassistanttool-1-0-0-7-setup",
+    "version": "1.0.0.7",
+    "description": "AudioAssistantTool 1 0 0 7 Setup",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found%20exe/AudioAssistantTool_1.0.0.7_Setup.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

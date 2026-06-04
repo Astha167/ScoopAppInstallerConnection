@@ -1,0 +1,9 @@
+{
+    "version": "2015",
+    "description": "ASP.NET Web Frameworks and Tools VS2015",
+    "homepage": "https://microsoft.com",
+    "license": "Freeware",
+    "installer": {
+        "type": "gui"
+    }
+}

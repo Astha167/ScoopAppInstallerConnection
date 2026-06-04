@@ -1,0 +1,29 @@
+{
+    "name": "mysqlworkbench",
+    "version": "8.0.46",
+    "description": "Visual database design and administration tool for MySQL",
+    "homepage": "https://dev.mysql.com/downloads/workbench/",
+    "license": "GPL-2.0",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "https://dev.mysql.com/get/Downloads/MySQLGUITools/mysql-workbench-community-8.0.46-winx64.msi",
+            "extract_dir": "PFiles64\\MySQL\\MySQL Workbench 8.0 CE"
+        }
+    },
+    "bin": [
+        "MySQLWorkbench.exe",
+        "mysql.exe",
+        "mysqldump.exe"
+    ],
+    "shortcuts": [
+        [
+            "MySQLWorkbench.exe",
+            "MySQL Workbench"
+        ]
+    ],
+    "installer": {
+        "type": "msi"
+    },
+    "post_install": []
+}

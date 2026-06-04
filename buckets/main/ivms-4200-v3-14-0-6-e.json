@@ -1,0 +1,19 @@
+{
+    "name": "ivms-4200-v3-14-0-6-e",
+    "version": "3.14.0.6",
+    "description": "iVMS-4200 3.14.0.6 Win64",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/Downloads/iVMS-4200%28V3.14.0.6_E%29.exe"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "gui"
+    },
+    "post_install": []
+}

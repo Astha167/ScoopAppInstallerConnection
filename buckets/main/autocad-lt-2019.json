@@ -1,0 +1,17 @@
+{
+    "version": "2019",
+    "description": "AutoCAD LT 2019 English Localized Package",
+    "homepage": "https://www.autodesk.com",
+    "license": "Commercial",
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/sujit/OneDrive/Documents/found exe/AutoCAD_LT_2019_English_LP_Win_64bit_dlm.sfx.exe"
+        }
+    },
+    "installer": {
+        "type": "gui",
+        "file": "AutoCAD_LT_2019_English_LP_Win_64bit_dlm.sfx.exe",
+        "gui_exe": "Setup.exe"
+    },
+    "bin": "setup.exe"
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakingScoop Installer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="glass-panel">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group"></i>
+                <h1>MakingScoop</h1>
+                <span class="badge">Manager</span>
+            </div>
+            <div class="actions">
+                <button id="theme-toggle" class="icon-btn" title="Toggle Theme"><i
+                        class="fa-solid fa-moon"></i></button>
+            </div>
+        </header>
+
+        <main>
+            <div class="grid">
+                <!-- Installation Panel -->
+                <section class="glass-panel main-panel input-section">
+                    <h2><i class="fa-solid fa-rocket"></i> Install Applications</h2>
+                    <p class="subtitle">Provide an executable or a folder containing multiple executables.</p>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-folder-open icon-left"></i>
+                        <input type="text" id="install-path" placeholder="C:\\Path\\To\\File.exe or Folder...">
+                        <button id="btn-install" class="btn-primary">
+                            <span>InstallApp</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="status-monitor glass-panel-inner mt-4">
+                        <div class="monitor-header">
+                            <h3><i class="fa-solid fa-terminal"></i> Live Progress</h3>
+                            <div class="pulse-indicator" id="live-indicator"></div>
+                        </div>
+                        <ul id="log-list" class="log-list">
+                            <li class="log-entry system"><span class="time"></span> <span class="msg">System ready.
+                                    Waiting for installation to start...</span></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Installed Apps Panel -->
+                <section class="glass-panel side-panel apps-section">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-box-open"></i> Installed Apps</h2>
+                        <button id="btn-refresh" class="icon-btn sm" title="Refresh List"><i
+                                class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+
+                    <div id="apps-container" class="apps-list">
+                        <!-- Apps will be injected here via JS -->
+                        <div class="loading-state">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
+                            <p>Loading applications...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

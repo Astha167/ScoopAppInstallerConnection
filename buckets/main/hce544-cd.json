@@ -1,0 +1,19 @@
+{
+    "name": "hce544-cd",
+    "version": "unknown",
+    "description": "hce544 cd",
+    "homepage": "",
+    "license": "Proprietary",
+    "depends": [],
+    "architecture": {
+        "64bit": {
+            "url": "file:///C:/Users/astha/Downloads/hce544_cd.zip"
+        }
+    },
+    "bin": [],
+    "shortcuts": [],
+    "installer": {
+        "type": "zip"
+    },
+    "post_install": []
+}
