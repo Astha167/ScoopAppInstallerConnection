@@ -30,6 +30,12 @@ from myscoop.dependency import DependencyResolver, CircularDependencyError
 from myscoop.bucket import BucketManager, BucketError
 from myscoop.metadata import AppMetadata, find_installed_executables
 from myscoop.local_manifest import LocalManifestManager, LocalManifestError
+from myscoop.install_state import (
+    cleanup_empty_app_folder,
+    get_valid_installed_versions,
+    inspect_install_path,
+    remove_install_path,
+)
 
 try:
     from myscoop.gui_installer import GUIInstaller, GUIInstallError
@@ -282,7 +288,7 @@ def install_single_app(
             f"{Fore.YELLOW}'{app_name}' is already installed. "
             f"Run: myscoop update {app_name}{Style.RESET_ALL}"
         )
-        return False
+        return True
 
     if is_dependency:
         click.echo(f"\n{Fore.BLUE}Installing dependency: {app_name}{Style.RESET_ALL}")
@@ -386,16 +392,25 @@ def install_single_app(
                                 f"{Fore.RED}  GUI automation "
                                 f"reported failure{Style.RESET_ALL}"
                             )
+                            raise SilentInstallError(
+                                "GUI automation reported failure."
+                            )
                     else:
                         click.echo(
                             f"{Fore.YELLOW}  GUI automation unavailable. "
                             f"Install deps: pip install pywinauto "
                             f"pyautogui psutil{Style.RESET_ALL}"
                         )
+                        raise SilentInstallError(
+                            "GUI automation is unavailable."
+                        )
                 else:
                     click.echo(
                         f"{Fore.YELLOW}  GUI exe not found: "
                         f"{gui_exe_path}{Style.RESET_ALL}"
+                    )
+                    raise SilentInstallError(
+                        f"GUI exe not found for '{manifest.name}'."
                     )
         elif manifest.installer_type == "msi" or (filepath and Path(filepath).suffix.lower() == ".msi"):
             click.echo(
@@ -425,6 +440,20 @@ def install_single_app(
     else:
         app_dir = os.path.join(APPS_DIR, app_name, manifest.version)
         os.makedirs(app_dir, exist_ok=True)
+
+    install_state = inspect_install_path(app_dir)
+    if not install_state.valid:
+        remove_install_path(app_dir)
+        cleanup_empty_app_folder(APPS_DIR, app_name)
+        click.echo(
+            f"{Fore.RED}  Installation unsuccessful for '{manifest.name}': "
+            f"{install_state.reason}. Removed incomplete folder: "
+            f"{install_state.path}{Style.RESET_ALL}"
+        )
+        raise SilentInstallError(
+            f"Installation unsuccessful for '{manifest.name}': "
+            f"{install_state.reason}."
+        )
 
     # Create shims for all bin entries
     if manifest.bin:
@@ -598,6 +627,7 @@ def install(app: str, local_file: Optional[str] = None):
     install_order = resolver.resolve(app)
 
     # Install dependencies first, then the app
+    app_installed = False
     for i, dep_name in enumerate(install_order):
         is_dep = (dep_name.lower() != app.lower())
 
@@ -608,7 +638,20 @@ def install(app: str, local_file: Optional[str] = None):
 
         # Only pass --file for the main app, not dependencies
         file_arg = local_file if not is_dep else None
-        install_single_app(dep_name, buckets_dir, is_dependency=is_dep, local_file=file_arg)
+        installed = install_single_app(
+            dep_name,
+            buckets_dir,
+            is_dependency=is_dep,
+            local_file=file_arg,
+        )
+        if not is_dep:
+            app_installed = installed
+
+    if not app_installed:
+        click.echo(
+            f"{Fore.RED}Installation unsuccessful for '{app}'.{Style.RESET_ALL}"
+        )
+        sys.exit(1)
 
 
 def _resolve_install_target(
@@ -696,12 +739,13 @@ def list_apps():
         app_path = os.path.join(APPS_DIR, app_name)
         if not os.path.isdir(app_path):
             continue
-        versions = [
-            d for d in os.listdir(app_path)
-            if os.path.isdir(os.path.join(app_path, d))
-        ]
+        versions = get_valid_installed_versions(
+            APPS_DIR,
+            app_name,
+            cleanup_invalid=True,
+        )
         if versions:
-            version = sorted(versions)[-1]
+            version = versions[-1]
             apps.append((app_name, version))
 
     if not apps:

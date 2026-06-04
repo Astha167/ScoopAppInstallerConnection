@@ -10,10 +10,10 @@ Usage:
     # Returns: ["vcredist2022", "mysqlworkbench"]
 """
 
-import os
-from typing import Callable, List, Optional, Set
+from typing import List, Optional, Set
 
 from myscoop.manifest import Manifest, ManifestNotFoundError
+from myscoop.install_state import get_valid_installed_versions, is_app_installed
 
 
 class CircularDependencyError(Exception):
@@ -73,23 +73,19 @@ class DependencyResolver:
         Check if an app is already installed.
 
         An app is considered installed if its directory exists under apps_dir
-        and contains at least one version subfolder.
+        and contains at least one non-negligible version subfolder.
 
         Args:
             app_name: Name of the app to check.
 
         Returns:
-            True if the app directory exists.
+            True if a valid app version directory exists.
         """
-        app_path = os.path.join(self.apps_dir, app_name.lower())
-        if not os.path.exists(app_path):
-            return False
-        # Check that it has at least one version directory with files
-        try:
-            entries = os.listdir(app_path)
-            return len(entries) > 0
-        except OSError:
-            return False
+        return is_app_installed(
+            self.apps_dir,
+            app_name,
+            cleanup_invalid=True,
+        )
 
     def get_installed_version(self, app_name: str) -> Optional[str]:
         """
@@ -98,18 +94,13 @@ class DependencyResolver:
         Returns:
             Version string or None if not installed.
         """
-        app_path = os.path.join(self.apps_dir, app_name.lower())
-        if not os.path.exists(app_path):
-            return None
-        try:
-            versions = [
-                d for d in os.listdir(app_path)
-                if os.path.isdir(os.path.join(app_path, d))
-            ]
-            if versions:
-                return sorted(versions)[-1]  # Return latest version
-        except OSError:
-            pass
+        versions = get_valid_installed_versions(
+            self.apps_dir,
+            app_name,
+            cleanup_invalid=True,
+        )
+        if versions:
+            return versions[-1]  # Return latest valid version
         return None
 
     def get_dependency_tree(self, app_name: str, indent: int = 0) -> str:

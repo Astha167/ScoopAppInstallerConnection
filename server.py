@@ -26,6 +26,7 @@ _configure_text_stream(sys.stderr)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from myscoop.cli import APPS_DIR
+from myscoop.install_state import get_valid_installed_versions
 
 app = FastAPI(title="MakingScoop Manager API")
 
@@ -109,12 +110,13 @@ def list_apps():
         app_path = os.path.join(APPS_DIR, app_name)
         if not os.path.isdir(app_path):
             continue
-        versions = [
-            d for d in os.listdir(app_path)
-            if os.path.isdir(os.path.join(app_path, d))
-        ]
+        versions = get_valid_installed_versions(
+            APPS_DIR,
+            app_name,
+            cleanup_invalid=True,
+        )
         if versions:
-            version = sorted(versions)[-1]
+            version = versions[-1]
             apps.append({"name": app_name, "version": version})
 
     return {"apps": apps}
@@ -181,9 +183,12 @@ def process_installation_queue_sync(target_path: str):
                 process.wait()
                 
                 if process.returncode == 0:
-                    log_status(f"Successfully installed: {installer_path}")
+                    log_status(f"Installation successful: {installer_path}")
                 else:
-                    log_status(f"Failed to install '{installer_path}': process returned {process.returncode}")
+                    log_status(
+                        f"Installation unsuccessful for '{installer_path}': "
+                        f"process returned {process.returncode}"
+                    )
                     
             except Exception as e:
                 # Catch error so it continues to next app
