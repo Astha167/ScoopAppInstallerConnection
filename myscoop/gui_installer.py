@@ -380,8 +380,10 @@ class GUIInstaller:
             return True
 
         except GUIInstallError:
+            self._cleanup_failed_installer(process)
             raise
         except Exception as e:
+            self._cleanup_failed_installer(process)
             raise GUIInstallError(f"GUI automation failed: {e}")
 
     # ──────────────────────────────────────────────
@@ -434,6 +436,47 @@ class GUIInstaller:
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
         return pids
+
+    def _cleanup_failed_installer(self, process: subprocess.Popen) -> None:
+        """Stop a failed GUI installer before the AI fallback launches it again."""
+        pids = self._get_process_tree_pids(process.pid)
+
+        if psutil is not None:
+            processes = []
+            for pid in pids:
+                try:
+                    processes.append(psutil.Process(pid))
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.Error):
+                    continue
+
+            for proc in processes:
+                try:
+                    if proc.is_running():
+                        proc.terminate()
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.Error):
+                    pass
+
+            _, alive = psutil.wait_procs(processes, timeout=5)
+            for proc in alive:
+                try:
+                    proc.kill()
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.Error):
+                    pass
+
+        if process.poll() is None:
+            try:
+                process.terminate()
+                process.wait(timeout=5)
+            except Exception:
+                if os.name == "nt":
+                    subprocess.run(
+                        ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        check=False,
+                    )
+                else:
+                    process.kill()
 
     def _is_installer_window(self, title: str) -> bool:
         """Check if a window title looks like an installer wizard."""
