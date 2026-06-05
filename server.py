@@ -1,6 +1,7 @@
 import os
 import sys
 import asyncio
+import subprocess
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
@@ -42,6 +43,63 @@ import threading
 # Active client queues for broadcasting
 active_clients_lock = threading.Lock()
 active_clients = set()
+
+# Graceful shutdown state. Install work runs in a background thread and may
+# block on child processes, so Ctrl+C needs an explicit signal and process
+# cleanup path.
+shutdown_event = threading.Event()
+active_processes_lock = threading.Lock()
+active_processes = set()
+active_install_tasks = set()
+
+
+def _register_process(process):
+    with active_processes_lock:
+        active_processes.add(process)
+
+
+def _unregister_process(process):
+    with active_processes_lock:
+        active_processes.discard(process)
+
+
+def _terminate_process(process, timeout: float = 5.0) -> None:
+    try:
+        if process.poll() is None:
+            try:
+                process.terminate()
+                process.wait(timeout=timeout)
+            except Exception:
+                if os.name == "nt":
+                    try:
+                        subprocess.run(
+                            ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                            check=False,
+                        )
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        process.kill()
+                    except Exception:
+                        pass
+    finally:
+        stdout = getattr(process, "stdout", None)
+        if stdout is not None:
+            try:
+                stdout.close()
+            except Exception:
+                pass
+
+
+def _terminate_active_processes() -> None:
+    with active_processes_lock:
+        processes = list(active_processes)
+
+    for process in processes:
+        _terminate_process(process)
 
 # Ensure standard output also goes to our status_queue so the user sees it
 class StreamLogger:
@@ -89,6 +147,15 @@ sys.stdout = StreamLogger(sys.stdout)
 
 def log_status(msg: str):
     print(msg)
+
+
+@app.on_event("shutdown")
+async def shutdown_install_workers():
+    shutdown_event.set()
+    log_status("Server shutdown requested; stopping active installations...")
+    _terminate_active_processes()
+    for task in list(active_install_tasks):
+        task.cancel()
 
 # ---------------------------------------------------------------------------
 # Fallback architecture: MakingScoop (AI/UI-TARS driven automation)
@@ -139,6 +206,10 @@ def forward_to_makingscoop_fallback(installer_path: str) -> None:
     subscribes to MakingScoop's SSE stream and relays only the terminal
     success/failure/error messages back to this server's own clients.
     """
+    if shutdown_event.is_set():
+        log_status("AI fallback skipped because server shutdown is in progress.")
+        return
+
     try:
         import requests
     except ImportError:
@@ -157,7 +228,7 @@ def forward_to_makingscoop_fallback(installer_path: str) -> None:
 
     log_status(f"AI fallback accepted the installer: {installer_path}")
 
-    if not RELAY_FALLBACK_LOGS:
+    if shutdown_event.is_set() or not RELAY_FALLBACK_LOGS:
         return
 
     # Follow MakingScoop's log stream and relay only meaningful outcome messages.
@@ -166,12 +237,15 @@ def forward_to_makingscoop_fallback(installer_path: str) -> None:
         with requests.get(
             status_url,
             stream=True,
-            timeout=(15, FALLBACK_STREAM_TIMEOUT),
+            timeout=(15, 5),
             headers={"Accept": "text/event-stream"},
         ) as stream:
             stream.raise_for_status()
             deadline = time.time() + FALLBACK_STREAM_TIMEOUT
             for raw_line in stream.iter_lines(decode_unicode=True):
+                if shutdown_event.is_set():
+                    log_status("AI fallback log relay stopped due to server shutdown.")
+                    break
                 if time.time() > deadline:
                     log_status("AI fallback log relay timed out; stopping stream.")
                     break
@@ -247,10 +321,12 @@ def process_installation_queue_sync(target_path: str):
             return
 
         for installer_path in targets:
+            if shutdown_event.is_set():
+                log_status("Installation queue stopped because server shutdown is in progress.")
+                break
+
             log_status(f"\\n--- Starting install for: {installer_path} ---")
             try:
-                import subprocess
-
                 # Pass the installer/archive path directly to the CLI.
                 # The CLI's _resolve_install_target will find the best
                 # matching manifest (e.g. 'abb' with gui installer type)
@@ -273,16 +349,25 @@ def process_installation_queue_sync(target_path: str):
                     cwd=os.path.dirname(os.path.abspath(__file__)),
                     env=env,
                 )
+                _register_process(process)
                 
-                # Stream logs live to connected clients
-                for line in process.stdout:
-                    if line:
-                        log_status(line.strip())
-                        
-                process.wait()
+                try:
+                    # Stream logs live to connected clients. On shutdown the
+                    # shutdown hook terminates the child process, closing this
+                    # pipe and allowing the thread to exit.
+                    if process.stdout is None:
+                        raise RuntimeError("Failed to capture installer output.")
+                    for line in process.stdout:
+                        if line:
+                            log_status(line.strip())
+                    process.wait()
+                finally:
+                    _unregister_process(process)
                 
                 if process.returncode == 0:
                     log_status(f"Installation successful: {installer_path}")
+                elif shutdown_event.is_set():
+                    log_status(f"Installation stopped during server shutdown: {installer_path}")
                 else:
                     log_status(
                         f"Installation unsuccessful for '{installer_path}': "
@@ -290,7 +375,8 @@ def process_installation_queue_sync(target_path: str):
                     )
                     # Primary engine failed -> hand off to MakingScoop's AI
                     # (UI-TARS) automation as a fallback.
-                    forward_to_makingscoop_fallback(installer_path)
+                    if not shutdown_event.is_set():
+                        forward_to_makingscoop_fallback(installer_path)
                     
             except Exception as e:
                 # Catch error so it continues to next app
@@ -306,9 +392,14 @@ from fastapi.concurrency import run_in_threadpool
 @app.post("/api/install")
 async def start_install(req: InstallRequest):
     """Enqueue installation of a file or folder of executables."""
+    if shutdown_event.is_set():
+        return {"message": "Server is shutting down; installation was not started.", "path": req.path}
+
     target_path = req.path
     # Run the installation wrapper in background so we don't block the API event loop
-    asyncio.create_task(run_in_threadpool(process_installation_queue_sync, target_path))
+    task = asyncio.create_task(run_in_threadpool(process_installation_queue_sync, target_path))
+    active_install_tasks.add(task)
+    task.add_done_callback(active_install_tasks.discard)
     return {"message": "Installation started in background.", "path": target_path}
 
 @app.get("/api/install/status")
@@ -322,6 +413,9 @@ async def stream_status(request: Request):
         last_ping = time.time()
         try:
             while True:
+                if shutdown_event.is_set():
+                    yield "data: Server shutting down\\n\\n"
+                    break
                 # Check if client disconnected
                 if await request.is_disconnected():
                     break
@@ -346,4 +440,6 @@ async def stream_status(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
+
+    reload_enabled = os.environ.get("SCOOP_RELOAD", "0").lower() in ("1", "true", "yes")
+    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=reload_enabled)
