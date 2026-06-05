@@ -638,12 +638,21 @@ def install(app: str, local_file: Optional[str] = None):
 
         # Only pass --file for the main app, not dependencies
         file_arg = local_file if not is_dep else None
-        installed = install_single_app(
-            dep_name,
-            buckets_dir,
-            is_dependency=is_dep,
-            local_file=file_arg,
-        )
+        try:
+            installed = install_single_app(
+                dep_name,
+                buckets_dir,
+                is_dependency=is_dep,
+                local_file=file_arg,
+            )
+        except BaseException:
+            # A failed/aborted install (e.g. GUI automation never found the
+            # setup window) can leave behind an empty apps/<app>/<version>
+            # folder. Purge invalid/empty version folders so the app is not
+            # mistaken for "already installed" on a retry or by the
+            # MakingScoop AI fallback engine.
+            get_valid_installed_versions(APPS_DIR, dep_name, cleanup_invalid=True)
+            raise
         if not is_dep:
             app_installed = installed
 

@@ -90,6 +90,105 @@ sys.stdout = StreamLogger(sys.stdout)
 def log_status(msg: str):
     print(msg)
 
+# ---------------------------------------------------------------------------
+# Fallback architecture: MakingScoop (AI/UI-TARS driven automation)
+#
+# This server (ScoopApp-Installer) is the *primary* installation engine and
+# runs on port 8000. When an installation fails (non-zero return code) we hand
+# the same installer path off to MakingScoop, which drives the setup wizard
+# visually using the UI-TARS vision model.
+#
+# Port map (UI-TARS model port 8001 is fixed and cannot be changed):
+#   8000 -> ScoopApp-Installer API (this server, primary engine)
+#   8001 -> UI-TARS vision model endpoint (used internally by MakingScoop)
+#   8002 -> MakingScoop API (AI fallback engine)
+# ---------------------------------------------------------------------------
+MAKINGSCOOP_BASE_URL = os.environ.get("MAKINGSCOOP_BASE_URL", "http://127.0.0.1:8002").rstrip("/")
+# Whether to subscribe to MakingScoop's SSE stream and relay terminal
+# (success/failure/error) messages back to our own frontend.
+RELAY_FALLBACK_LOGS = os.environ.get("SCOOP_RELAY_FALLBACK_LOGS", "1").lower() not in ("0", "false", "no")
+# Overall safety cap (seconds) for how long we follow the fallback log stream.
+FALLBACK_STREAM_TIMEOUT = int(os.environ.get("SCOOP_FALLBACK_STREAM_TIMEOUT", "1800"))
+
+
+def _is_terminal_fallback_message(message: str) -> bool:
+    """Only success / unsuccessful / error / completion messages are relayed.
+
+    Streaming every AI log line back would be a huge overhead, so we filter the
+    MakingScoop SSE feed down to the messages that actually tell the user the
+    outcome of the AI-driven installation.
+    """
+    lowered = message.lower()
+    keywords = (
+        "successfully installed",
+        "installation successful",
+        "failed to install",
+        "unsuccessful",
+        "all installations complete",
+        "error",
+        "critical error",
+        "path does not exist",
+    )
+    return any(k in lowered for k in keywords)
+
+
+def forward_to_makingscoop_fallback(installer_path: str) -> None:
+    """Delegate a failed installation to MakingScoop's AI automation.
+
+    Sends a single HTTP POST carrying the installer path, then (optionally)
+    subscribes to MakingScoop's SSE stream and relays only the terminal
+    success/failure/error messages back to this server's own clients.
+    """
+    try:
+        import requests
+    except ImportError:
+        log_status("AI fallback unavailable: the 'requests' package is not installed.")
+        return
+
+    install_url = f"{MAKINGSCOOP_BASE_URL}/api/install"
+    log_status(f"Delegating to AI fallback (MakingScoop) at {install_url}")
+
+    try:
+        resp = requests.post(install_url, json={"path": installer_path}, timeout=15)
+        resp.raise_for_status()
+    except requests.RequestException as exc:
+        log_status(f"AI fallback request failed: could not reach MakingScoop ({exc}).")
+        return
+
+    log_status(f"AI fallback accepted the installer: {installer_path}")
+
+    if not RELAY_FALLBACK_LOGS:
+        return
+
+    # Follow MakingScoop's log stream and relay only meaningful outcome messages.
+    status_url = f"{MAKINGSCOOP_BASE_URL}/api/install/status"
+    try:
+        with requests.get(
+            status_url,
+            stream=True,
+            timeout=(15, FALLBACK_STREAM_TIMEOUT),
+            headers={"Accept": "text/event-stream"},
+        ) as stream:
+            stream.raise_for_status()
+            deadline = time.time() + FALLBACK_STREAM_TIMEOUT
+            for raw_line in stream.iter_lines(decode_unicode=True):
+                if time.time() > deadline:
+                    log_status("AI fallback log relay timed out; stopping stream.")
+                    break
+                if not raw_line or not raw_line.startswith("data:"):
+                    continue
+                payload = raw_line[len("data:"):].strip()
+                if not payload or payload == "ping":
+                    continue
+                if _is_terminal_fallback_message(payload):
+                    log_status(f"[AI] {payload}")
+                    # The completion sentinel marks the end of the AI run.
+                    if "all installations complete" in payload.lower():
+                        break
+    except requests.RequestException as exc:
+        log_status(f"AI fallback log relay ended: {exc}")
+
+
 class InstallRequest(BaseModel):
     path: str
 
@@ -189,6 +288,9 @@ def process_installation_queue_sync(target_path: str):
                         f"Installation unsuccessful for '{installer_path}': "
                         f"process returned {process.returncode}"
                     )
+                    # Primary engine failed -> hand off to MakingScoop's AI
+                    # (UI-TARS) automation as a fallback.
+                    forward_to_makingscoop_fallback(installer_path)
                     
             except Exception as e:
                 # Catch error so it continues to next app
