@@ -34,8 +34,10 @@ from myscoop.install_state import (
     cleanup_empty_app_folder,
     get_valid_installed_versions,
     inspect_install_path,
+    record_registry_install,
     remove_install_path,
 )
+from myscoop.registry_state import is_app_installed_in_registry
 
 try:
     from myscoop.gui_installer import GUIInstaller, GUIInstallError
@@ -442,13 +444,33 @@ def install_single_app(
         os.makedirs(app_dir, exist_ok=True)
 
     install_state = inspect_install_path(app_dir)
+
+    # Many GUI installers place their payload outside myscoop's managed apps
+    # folder (e.g. into Program Files), so an empty folder does not necessarily
+    # mean failure. Confirm against the Windows Registry uninstall entries
+    # before deciding the install failed.
+    if not install_state.valid:
+        registry_names = [manifest.name, app_name]
+        if filepath:
+            registry_names.append(Path(filepath).stem)
+        registry_match = is_app_installed_in_registry(*registry_names)
+        if registry_match:
+            display_name = registry_match.get("DisplayName") or manifest.name
+            publisher = registry_match.get("Publisher") or "unknown"
+            click.echo(
+                f"{Fore.GREEN}  Verified via Windows Registry: '{display_name}' "
+                f"(publisher: {publisher}){Style.RESET_ALL}"
+            )
+            record_registry_install(app_dir, registry_match)
+            install_state = inspect_install_path(app_dir)
+
     if not install_state.valid:
         remove_install_path(app_dir)
         cleanup_empty_app_folder(APPS_DIR, app_name)
         click.echo(
             f"{Fore.RED}  Installation unsuccessful for '{manifest.name}': "
-            f"{install_state.reason}. Removed incomplete folder: "
-            f"{install_state.path}{Style.RESET_ALL}"
+            f"{install_state.reason}. Not found in Windows Registry either. "
+            f"Removed incomplete folder: {install_state.path}{Style.RESET_ALL}"
         )
         raise SilentInstallError(
             f"Installation unsuccessful for '{manifest.name}': "

@@ -3,21 +3,28 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 import os
 import shutil
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 
 DEFAULT_MIN_PAYLOAD_SIZE_BYTES = int(
     os.environ.get("MYSCOOP_MIN_INSTALL_PAYLOAD_BYTES", "1024")
 )
 
+# Marker written when an installation is verified through the Windows Registry
+# rather than by files inside the managed apps folder (e.g. GUI installers that
+# install into Program Files). Its presence marks the version folder as valid.
+REGISTRY_MARKER_FILENAME = "registry_install.json"
+
 DIAGNOSTIC_FILENAMES = {
     "install.json",
     "metadata.json",
     "metadata_all.json",
     "gui_install_info.json",
+    REGISTRY_MARKER_FILENAME,
 }
 DIAGNOSTIC_EXTENSIONS = {".log", ".tmp"}
 
@@ -54,6 +61,18 @@ def inspect_install_path(
             total_size_bytes=0,
             payload_size_bytes=0,
             reason="install folder was not created",
+        )
+
+    # An install verified via the Windows Registry is valid even if it has no
+    # payload inside the managed apps folder (it lives elsewhere on the system).
+    if os.path.isfile(os.path.join(install_path, REGISTRY_MARKER_FILENAME)):
+        return InstallState(
+            path=install_path,
+            exists=True,
+            valid=True,
+            total_size_bytes=0,
+            payload_size_bytes=0,
+            reason="installation verified via Windows Registry",
         )
 
     total_size = 0
@@ -134,6 +153,24 @@ def is_app_installed(
             cleanup_invalid=cleanup_invalid,
         )
     )
+
+
+def record_registry_install(install_path: str, entry: Dict[str, str]) -> None:
+    """Persist a marker recording that an install was verified via the registry."""
+    os.makedirs(install_path, exist_ok=True)
+    marker = {
+        "verified_by": "windows_registry",
+        "display_name": entry.get("DisplayName", ""),
+        "publisher": entry.get("Publisher", ""),
+        "display_version": entry.get("DisplayVersion", ""),
+        "install_location": entry.get("InstallLocation", ""),
+    }
+    marker_path = os.path.join(install_path, REGISTRY_MARKER_FILENAME)
+    try:
+        with open(marker_path, "w", encoding="utf-8") as handle:
+            json.dump(marker, handle, indent=4)
+    except OSError:
+        pass
 
 
 def remove_install_path(path: str) -> None:
