@@ -20,6 +20,12 @@
                 <h1>MakingScoop</h1>
                 <span class="badge">Manager</span>
             </div>
+            <div class="header-status">
+                <div class="connection-status" id="connection-status">
+                    <div class="status-dot" id="status-dot"></div>
+                    <span id="status-text">Initializing...</span>
+                </div>
+            </div>
             <div class="actions">
                 <button id="theme-toggle" class="icon-btn" title="Toggle Theme"><i
                         class="fa-solid fa-moon"></i></button>
@@ -42,6 +48,20 @@
                         </button>
                     </div>
 
+                    <!-- Installation Status Card -->
+                    <div class="installation-status glass-panel-inner mt-4">
+                        <div class="status-header">
+                            <h3><i class="fa-solid fa-circle-info"></i> Installation Status</h3>
+                        </div>
+                        <div class="status-content">
+                            <div class="status-badge" id="status-badge">
+                                <span class="status-icon pending"></span>
+                                <span class="status-label" id="status-label">Ready</span>
+                            </div>
+                            <p class="status-message" id="status-message">Waiting for installation to start...</p>
+                        </div>
+                    </div>
+
                     <div class="status-monitor glass-panel-inner mt-4">
                         <div class="monitor-header">
                             <h3><i class="fa-solid fa-terminal"></i> Live Progress</h3>
@@ -51,23 +71,6 @@
                             <li class="log-entry system"><span class="time"></span> <span class="msg">System ready.
                                     Waiting for installation to start...</span></li>
                         </ul>
-                    </div>
-                </section>
-
-                <!-- Installed Apps Panel -->
-                <section class="glass-panel side-panel apps-section">
-                    <div class="panel-header">
-                        <h2><i class="fa-solid fa-box-open"></i> Installed Apps</h2>
-                        <button id="btn-refresh" class="icon-btn sm" title="Refresh List"><i
-                                class="fa-solid fa-rotate-right"></i></button>
-                    </div>
-
-                    <div id="apps-container" class="apps-list">
-                        <!-- Apps will be injected here via JS -->
-                        <div class="loading-state">
-                            <i class="fa-solid fa-circle-notch fa-spin"></i>
-                            <p>Loading applications...</p>
-                        </div>
                     </div>
                 </section>
             </div>
