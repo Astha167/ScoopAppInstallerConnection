@@ -97,7 +97,49 @@ header {
     letter-spacing: -0.5px;
 }
 
-.badge {
+.header-status {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="light"] .connection-status {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-dot.connected {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.status-dot.disconnected {
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+}
+
+#status-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
@@ -108,17 +150,11 @@ header {
     letter-spacing: 1px;
 }
 
-/* Main Grid Layout */
+/* Main Grid Layout - Single Column */
 .grid {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1fr;
     gap: 2rem;
-}
-
-@media (max-width: 900px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* Elements */
@@ -273,6 +309,144 @@ button {
     gap: 0.5rem;
 }
 
+/* Logging Monitor */
+.monitor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.monitor-header h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Installation Status Card */
+.installation-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.status-header {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.status-header h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.status-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .status-badge {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.status-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-icon.pending {
+    background: var(--text-muted);
+}
+
+.status-icon.downloading {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+}
+
+.status-icon.installing-myscoop {
+    background: var(--secondary);
+    box-shadow: 0 0 6px var(--secondary);
+}
+
+.status-icon.failed-myscoop {
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef4444;
+}
+
+.status-icon.falling-back {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+}
+
+.status-icon.installing-uitars {
+    background: var(--primary);
+    box-shadow: 0 0 6px var(--primary);
+}
+
+.status-icon.completed {
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+}
+
+.status-icon.failed {
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef4444;
+}
+
+.status-label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.status-message {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border-left: 3px solid var(--text-muted);
+}
+
+.status-message.warning {
+    border-left-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.status-message.error {
+    border-left-color: #ef4444;
+    color: #ef4444;
+}
+
+.status-message.success {
+    border-left-color: var(--success);
+    color: var(--success);
+}
+
 .pulse-indicator {
     width: 10px;
     height: 10px;
@@ -352,120 +526,4 @@ button {
 
 .log-entry .msg {
     color: var(--text-main);
-}
-
-/* Apps List Panel */
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.apps-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-}
-
-.apps-list::-webkit-scrollbar {
-    width: 4px;
-}
-
-.apps-list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.apps-list::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 10px;
-}
-
-.app-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 1rem;
-    border-radius: 12px;
-    transition: transform 0.2s ease, background 0.2s ease;
-}
-
-[data-theme="light"] .app-card {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
-.app-card:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="light"] .app-card:hover {
-    background: rgba(255, 255, 255, 0.8);
-}
-
-.app-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.app-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    color: var(--secondary);
-}
-
-.app-details h4 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 0.2rem;
-    text-transform: capitalize;
-}
-
-.app-details p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.loading-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 0;
-    color: var(--text-muted);
-    gap: 1rem;
-}
-
-.loading-state i {
-    font-size: 2rem;
-    color: var(--primary);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 2rem 0;
-    color: var(--text-muted);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.empty-state i {
-    font-size: 3rem;
-    opacity: 0.5;
-    margin-bottom: 0.5rem;
 }
